@@ -34,6 +34,7 @@ async def root(request: Request):
 
 @app.post("/")
 async def login(
+    request: Request,
     time: Annotated[str, Form],
     money: Annotated[str, Form],
     address: Annotated[str, Form]
@@ -50,7 +51,9 @@ async def login(
     stops_df = st.relevant_stops(lng, lat)
 
     # Get json with isopolygon and properties
-    isodistance = get_distance(lng, lat, "bycicle", 900) 
+    isodistance = get_distance(lng, lat, "bycicle", 900)
+    coords_map = isodistance["features"]["geometry"]["coordinates"]
+    
 
     # get json with points of interest
     geometry_id = isodistance["properties"]["id"]
@@ -58,14 +61,18 @@ async def login(
 
     stops = stops_df.to_dict(orient="records")
 
-    return {
-        "time": time,
-        "money": money,
-        "address_info": location_data,
-        "nearby_stops": stops,
-        "isodistance": geometry_id,
-        "points": points
-    }
+    return templates.TemplateResponse(
+        request=request, name="map_with_isochrone.html", context={"shape": coords_map}
+    )
+
+    # return {
+    #     "time": time,
+    #     "money": money,
+    #     "address_info": location_data,
+    #     "nearby_stops": stops,
+    #     "isodistance": geometry_id,
+    #     "points": points
+    # }
 
 
 # # EOF. ----------------------------------------------------
