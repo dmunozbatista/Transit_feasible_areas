@@ -4,7 +4,6 @@ from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from backend import get_relevant_stops as st
 
 # App handler -----------------------------------------------
 
@@ -24,7 +23,11 @@ async def root(request: Request):
     )
 
 @app.post("/")
-async def login(time: Annotated[str, Form()], money: Annotated[str, Form()], address: Annotated[str, Form()]):
+async def login(
+    time: Annotated[str, Form],
+    money: Annotated[str, Form],
+    address: Annotated[str, Form]
+):
     return {"time": time, "money":money, "address":address}
 
 
