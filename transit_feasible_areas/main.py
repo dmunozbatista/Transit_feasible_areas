@@ -7,6 +7,7 @@ from fastapi.templating import Jinja2Templates
 import httpx
 import googlemaps
 from backend.inputs import geocode_address
+from backend import get_relevant_stops as st
 
 # App handler -----------------------------------------------
 
@@ -31,22 +32,31 @@ async def root(request: Request):
     )
 
 @app.post("/")
+@app.post("/")
 async def login(
     time: Annotated[str, Form],
     money: Annotated[str, Form],
     address: Annotated[str, Form]
 ):
-    # Geocode the address
     location_data = geocode_address(address)
 
     if "error" in location_data:
-        return location_data  # You could later return a nicer error page
+        return location_data  # Later show a better error page
 
-    # For now, just return everything together
+    lat = location_data["latitude"]
+    lng = location_data["longitude"]
+
+    # Now find nearby stops
+    stops_df = st.relevant_stops(lat, lng)
+
+    # (optional) If you want to return as a dictionary list:
+    stops = stops_df.to_dict(orient="records")
+
     return {
         "time": time,
         "money": money,
-        "address_info": location_data
+        "address_info": location_data,
+        "nearby_stops": stops
     }
 
 
