@@ -16,7 +16,8 @@ dependencies = [
   "ipdb>=0.13.13",
   "ipython>=8.27.0",
   "textual>=1.0.0",
-  "freezegun>=1.5.1"
+  "freezegun>=1.5.1",
+  "googlemaps>=4.10.0
 ]
 
 
