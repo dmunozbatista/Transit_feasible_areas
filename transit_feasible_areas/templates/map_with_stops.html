@@ -69,6 +69,20 @@
             zoom: 10 // starting zoom
         });
 
+        {% if render_stops %}
+            map.addSource(
+                {{% stops %}}
+            )
+        {% endif %}
+
+        {% if render_stops %}
+            map.addSource(
+                map.addLayer(
+
+                )
+            )
+        {% endif %}
+
     </script>
 </body>
 </html>
