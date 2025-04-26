@@ -6,7 +6,7 @@ import googlemaps
 app = FastAPI()
 
 def create_googlemaps_object():
-    return googlemaps.Client(key="AIzaSyB0OuiuAIilorHNhFQ9AUXhc7Jo9Rx6QgQ")
+    return googlemaps.Client(key="xx")
 
 googlemap = create_googlemaps_object()
 
