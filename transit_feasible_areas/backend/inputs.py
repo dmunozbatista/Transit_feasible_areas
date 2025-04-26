@@ -38,7 +38,6 @@ def geocode_address(address_input: AddressInput):
     lat = location['lat']
     lng = location['lng']
 
-    # Here just returning them for now
     return {
         "address": address_input.address,
         "latitude": lat,
