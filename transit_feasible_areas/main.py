@@ -1,6 +1,6 @@
 # Imports --------------------------------------------------
-
-from fastapi import FastAPI, Request
+from typing import Annotated
+from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -21,5 +21,10 @@ async def root(request: Request):
     return templates.TemplateResponse(
         request=request, name="map.html",
     )
+
+@app.post("/")
+async def login(time: Annotated[str, Form()], money: Annotated[str, Form()], address: Annotated[str, Form()]):
+    return {"time": time, "money":money, "address":address}
+
 
 # # EOF. ----------------------------------------------------
