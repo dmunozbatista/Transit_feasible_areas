@@ -23,8 +23,8 @@ async def root(request: Request):
     )
 
 @app.post("/")
-async def login(username: Annotated[str, Form()], password: Annotated[str, Form()]):
-    return {"username": username}
+async def login(time: Annotated[str, Form()], money: Annotated[str, Form()], address: Annotated[str, Form()]):
+    return {"time": time, "money":money, "address":address}
 
 
 # # EOF. ----------------------------------------------------
