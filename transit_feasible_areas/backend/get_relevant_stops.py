@@ -1,9 +1,10 @@
 import pandas as pd 
 import os
 import numpy as np
+import geopandas as pgd
 
 
-df_stops = pd.read_csv(os.path.join(os.path.dirname(_file_), 'all_stops.csv'))
+df_stops = pd.read_csv(os.path.join(os.path.dirname(__file__), 'all_stops.csv'))
 
 
 def haversine(lat1, lon1, lat2, lon2):
@@ -20,7 +21,7 @@ def haversine(lat1, lon1, lat2, lon2):
 
     return R * c
 
-def relevant_stops(center_lat, center_lon, radius_miles=3):
+def relevant_stops(center_lat, center_lon, radius_miles=3, save_geojson_path=None):
     lat1 = np.radians(center_lat)
     lon1 = np.radians(center_lon)
     lat2 = np.radians(df_stops['lat'])
@@ -34,6 +35,19 @@ def relevant_stops(center_lat, center_lon, radius_miles=3):
     distances = 3958.8 * c
 
     nearby = df_stops[distances <= radius_miles].copy()
-    # ONLY keep these columns
     nearby = nearby[['name', 'lat', 'lon', 'type']]
-    return nearby.reset_index(drop=True)
+    nearby = nearby.drop_duplicates(subset='name').reset_index(drop=True)  # Keep first occurrence if name repeats
+
+    # If user asked to save as GeoJSON
+    if save_geojson_path:
+        # Convert to GeoDataFrame and save
+        import geopandas as gpd
+        gdf = gpd.GeoDataFrame(
+            nearby,
+            geometry=gpd.points_from_xy(nearby.lon, nearby.lat),
+            crs="EPSG:4326"
+        )
+        gdf.to_file(save_geojson_path, driver='GeoJSON')
+        print(f"✅ Saved to {save_geojson_path}")
+
+    return nearby
