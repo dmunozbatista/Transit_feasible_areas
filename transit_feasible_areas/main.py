@@ -56,7 +56,6 @@ async def login(
     geometry_id = isodistance["properties"]["id"]
     points = get_points(geometry_id, lng, lat)
 
-    # (optional) If you want to return as a dictionary list:
     stops = stops_df.to_dict(orient="records")
 
     return {
