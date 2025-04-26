@@ -27,8 +27,7 @@ def cta_bus_stops(extract_path):
 
 def get_all_stops():
     """Main function to create a combined DataFrame of Divvy and CTA stops."""
-    base_dir = os.getcwd() 
-    kmz_path = os.path.join(base_dir, 'CTA_BusStops.kmz')
+    base_dir = os.getcwd()
     extract_path = os.path.join(base_dir, 'tmp')
 
     divvy_df = divvy_stations()
