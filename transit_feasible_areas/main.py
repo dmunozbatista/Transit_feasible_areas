@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from backend import get_relevant_stops as st
 
 # App handler -----------------------------------------------
 
@@ -28,3 +29,13 @@ async def login(time: Annotated[str, Form()], money: Annotated[str, Form()], add
 
 
 # # EOF. ----------------------------------------------------
+
+# get the lat and lon from address
+
+lat = 41.781729
+lon = -87.60491761427323
+
+# get bus and bike stations
+st.relevant_stops(lat, lon, 3) 
+
+#
