@@ -8,6 +8,7 @@ import httpx
 import googlemaps
 from backend.inputs import geocode_address
 from backend import get_relevant_stops as st
+from backend.get_api import get_distance, get_points
 
 # App handler -----------------------------------------------
 
@@ -32,7 +33,6 @@ async def root(request: Request):
     )
 
 @app.post("/")
-@app.post("/")
 async def login(
     time: Annotated[str, Form],
     money: Annotated[str, Form],
@@ -47,7 +47,14 @@ async def login(
     lng = location_data["longitude"]
 
     # Now find nearby stops
-    stops_df = st.relevant_stops(lat, lng)
+    stops_df = st.relevant_stops(lng, lat)
+
+    # Get json with isopolygon and properties
+    isodistance = get_distance(lng, lat, "bycicle", 900) 
+
+    # get json with points of interest
+    geometry_id = isodistance["properties"]["id"]
+    points = get_points(geometry_id, lng, lat)
 
     # (optional) If you want to return as a dictionary list:
     stops = stops_df.to_dict(orient="records")
@@ -56,7 +63,9 @@ async def login(
         "time": time,
         "money": money,
         "address_info": location_data,
-        "nearby_stops": stops
+        "nearby_stops": stops,
+        "isodistance": geometry_id,
+        "points": points
     }
 
 
