@@ -1,9 +1,11 @@
+import json
 import httpx
 import os
 from pathlib import Path
 import re
 
 START_URL_ISOLINES = "https://api.geoapify.com/v1/isoline?"
+START_URL_PLACES = "https://api.geoapify.com/v2/places?"
 IGNORED_KEYS = ["api_key","apikey"]
 ALLOWED_CHARS = "abcdefghijklmnopqrstuvwxyz1234567890%+,^=_"
 CACHE_DIR = Path(__file__).parent/ "data/cached"
@@ -16,11 +18,6 @@ except KeyError:
         "Make sure that you have set the API Key environment variable."
     )
 
-DEFAULT_ARGS = {"type": "time", 
-                "avoid": "ferries|highways",
-                "traffic": "approximated",
-                "api_key": API_KEY
-                }
 
 class RequestException(Exception):
     """
@@ -62,7 +59,7 @@ def url_to_cache_key(url: str) -> str:
     return cache_key
 
 
-def cached_get(url, mode, range, lon, lat, kwargs = DEFAULT_ARGS) -> dict:
+def cached_get(url, kwargs) -> dict:
     """
     This function caches all GET requests it makes, by writing
     the successful responses to disk.
@@ -84,11 +81,6 @@ def cached_get(url, mode, range, lon, lat, kwargs = DEFAULT_ARGS) -> dict:
     Raises:
         FetchException if a non-200 response occurs.
     """
-    kwargs["lon"] = lon
-    kwargs["lat"] = lat
-    kwargs["mode"] = mode
-    kwargs["range"] = range
-    
     query_url = combine_url_with_params(url, kwargs)
     file_params = {k: v for k, v in kwargs.items() if k not in IGNORED_KEYS}
     cached_key = url_to_cache_key(combine_url_with_params(url, file_params))
@@ -108,3 +100,45 @@ def cached_get(url, mode, range, lon, lat, kwargs = DEFAULT_ARGS) -> dict:
         # Case 3. The URL is not in the cache, and the server responds an error.
         raise RequestException(response)
     
+
+
+def get_distance(lon, lat, mode, range):
+    """"
+    Use cached_get to retrieve isocrone time
+    Input: 
+        lon
+        lat
+        range - time available to 
+        mode - vehicle in which the person is moving
+    Output:
+        isoline
+    """
+    kwargs = {"type": "time",
+              "lon": lon,
+              "lat": lat,
+              "mode": mode,
+              "range": range,
+              "avoid": "ferries|highways",
+              "traffic": "approximated",
+              "api_key": API_KEY
+                }
+    return json.loads(cached_get(START_URL_ISOLINES, kwargs))
+  
+
+def get_points(geometry_id, lon, lat):
+    """"
+    Use cached_get to retrieve isocrone time
+    Input: 
+        geometry
+
+    Output:
+        list of Points
+    """
+    kwargs = {"categories": "catering.cafe,education.library,catering.bar,sport.sports_centre",
+              "filter": f"geometry:{geometry_id}",
+              "bias": f"proximity:{lon},{lat}",
+              "limit": 50,
+              "api_key": API_KEY
+                }
+    
+    return json.loads(cached_get(START_URL_PLACES, kwargs))
